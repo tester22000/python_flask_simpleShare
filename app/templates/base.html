@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}심플 공유 앱{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <div class="flex-grow">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="fixed top-4 right-4 z-50">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div id="flash-message" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 shadow-lg rounded-lg transition-opacity duration-300 ease-in-out opacity-0" role="alert">
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        <script>
+            // 플래시 메시지 표시 및 자동 숨김
+            const flashMessage = document.getElementById('flash-message');
+            if (flashMessage) {
+                setTimeout(() => {
+                    flashMessage.classList.remove('opacity-0');
+                    flashMessage.classList.add('opacity-100');
+                }, 10); // 약간의 지연 후 표시
+                setTimeout(() => {
+                    flashMessage.classList.remove('opacity-100');
+                    flashMessage.classList.add('opacity-0');
+                    setTimeout(() => flashMessage.remove(), 500); // 완전히 사라진 후 DOM에서 제거
+                }, 5000); // 5초 후 숨김 시작
+            }
+        </script>
+        {% endif %}
+        {% endwith %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}파일 업로드{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4 flex-grow">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form id="upload-form" enctype="multipart/form-data">
+            <div id="drag-area" class="drag-area p-8 border-2 border-dashed border-gray-300 rounded-lg text-center transition-colors duration-200">
+                <p class="text-gray-500 font-semibold mb-2" id="file-name-display">파일을 선택하거나 드래그하여 놓으세요.</p>
+                <input type="file" id="file-input" name="file" class="hidden">
+            </div>
+            
+            <div class="flex justify-start gap-2 mt-6">
+                <p class="text-sm text-gray-500 mt-2">최대 5MB까지 업로드 가능합니다.</p>
+                <a href="#" id="btn-upload" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 transition-colors text-white">업로드</a>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <a href="{{ url_for('routes.index') }}" class="py-2 px-4 rounded-lg bg-gray-300 hover:bg-gray-400 transition-colors">취소</a>
+                <button type="submit" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 transition-colors text-white">저장</button>
+            </div>
+        </form>
+
+        <!-- 오류 메시지 영역 -->
+        <div id="error-message" class="mt-4 text-red-500 font-semibold hidden"></div>
+        
+        <!-- 업로드 진행률 표시 영역 -->
+        <div id="progress-bar-container" class="mt-4 hidden">
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <p id="progress-text" class="text-sm text-gray-500 mt-1"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    const fileInput = $('#file-input');
+    const dragArea = $('#drag-area');
+    const errorMessageDiv = $('#error-message');
+    const progressBarContainer = $('#progress-bar-container');
+    const progressBar = $('#progress-bar');
+    const progressText = $('#progress-text');
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    const btnUpload = $("#btn-upload")
+
+    // 드래그앤드롭 이벤트 리스너
+    dragArea.on('dragenter dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('drag-area-active');
+    }).on('dragleave drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('drag-area-active');
+    });
+
+    // 파일 드롭 시
+    dragArea.on('drop', function(e) {
+        e.preventDefault();
+        fileInput[0].files = e.originalEvent.dataTransfer.files;
+        updateFileName();
+    });
+    
+    // 이 부분을 추가하여 터치 및 클릭을 지원합니다.
+    btnUpload.on('click', function() {
+        console.log("click");
+        fileInput.click();
+    });
+
+    // 파일 선택 시
+    fileInput.on('change', function() {
+        console.log("change");
+        updateFileName();
+    });
+
+    // 파일명 및 유효성 검사 메시지 업데이트
+    function updateFileName() {
+        const files = fileInput[0].files;
+        errorMessageDiv.addClass('hidden').text('');
+        if (files.length > 0) {
+            const file = files[0];
+            $('#file-name-display').text(file.name);
+            if (file.size > maxFileSize) {
+                errorMessageDiv.removeClass('hidden').text('파일 크기가 5MB를 초과했습니다.');
+            }
+        } else {
+            $('#file-name-display').text('파일을 선택하거나 드래그하여 놓으세요.');
+        }
+    }
+
+    // 폼 제출 이벤트
+    $('#upload-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const files = fileInput[0].files;
+        errorMessageDiv.addClass('hidden').text('');
+        progressBarContainer.addClass('hidden');
+
+        if (files.length === 0) {
+            errorMessageDiv.removeClass('hidden').text('파일을 선택해주세요.');
+            return;
+        }
+
+        const file = files[0];
+        if (file.size > maxFileSize) {
+            errorMessageDiv.removeClass('hidden').text('파일 크기가 5MB를 초과했습니다.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // AJAX 요청으로 파일 업로드
+        $.ajax({
+            url: "{{ url_for('routes.upload_file_api') }}",
+            type: 'POST',
+            data: formData,
+            contentType: false, // FormData 사용 시 필수
+            processData: false, // FormData 사용 시 필수
+            xhr: function() {
+                const xhr = new window.XMLHttpRequest();
+                // 업로드 진행률 이벤트 리스너
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        const percentComplete = (evt.loaded / evt.total) * 100;
+                        progressBar.css('width', percentComplete + '%');
+                        progressText.text(`${Math.round(percentComplete)}% 업로드 중...`);
+                        progressBarContainer.removeClass('hidden');
+                    }
+                }, false);
+                return xhr;
+            },
+            success: function(response) {
+                // 성공 시 목록 페이지로 이동
+                window.location.href = "{{ url_for('routes.index') }}";
+            },
+            error: function(xhr) {
+                const response = JSON.parse(xhr.responseText);
+                errorMessageDiv.removeClass('hidden').text(response.error);
+                progressBarContainer.addClass('hidden');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

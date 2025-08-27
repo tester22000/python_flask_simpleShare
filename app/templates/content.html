@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}내용 보기{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4 flex-grow">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <button id="back-btn" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 transition-colors text-white flex items-center">
+                <svg width="24px" height="24px" viewBox="0 -960 960 960" fill="#FFFFFF"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+            </button>
+            <div class="flex gap-2">
+                <button id="copy-btn" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 transition-colors text-white flex items-center">
+                    <svg width="24px" height="24px"  viewBox="0 -960 960 960" fill="#FFFFFF"><path d="M760-200H320q-33 0-56.5-23.5T240-280v-560q0-33 23.5-56.5T320-920h280l240 240v400q0 33-23.5 56.5T760-200ZM560-640v-200H320v560h440v-360H560ZM160-40q-33 0-56.5-23.5T80-120v-560h80v560h440v80H160Zm160-800v200-200 560-560Z"/></svg>
+                </button>
+                <button id="delete-btn" data-id="{{ content.id }}" class="py-2 px-4 rounded-lg bg-red-500 hover:bg-red-600 transition-colors text-white flex items-center">
+                    <svg width="24px" height="24px"  viewBox="0 -960 960 960" fill="#FFFFFF"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+                </button>
+            </div>
+        </div>
+        
+        <div id="markdown-content" class="markdown-body p-4 rounded-lg">
+            <!-- {{ content.contents | markdown }} -->
+            {{ content.contents  }}
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // 복사 버튼 클릭 이벤트
+    $('#back-btn').on('click', function() {
+        window.location.href = "{{ url_for('routes.index') }}";
+    });
+
+    // 복사 버튼 클릭 이벤트
+    $('#copy-btn').on('click', function() {
+        // 복사할 텍스트 가져오기
+        const textToCopy = $('#markdown-content').text();
+        
+        // 클립보드에 복사
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert('내용이 클립보드에 복사되었습니다!');
+        }).catch(err => {
+            console.error('클립보드 복사 실패:', err);
+            alert('클립보드 복사에 실패했습니다.');
+        });
+    });
+
+    // 삭제 버튼 클릭 이벤트
+    $('#delete-btn').on('click', function() {
+        if (confirm('정말로 이 내용을 삭제하시겠습니까?')) {
+            const contentId = $(this).data('id');
+            $.ajax({
+                url: `/api/delete/${contentId}`,
+                type: 'DELETE',
+                success: function() {
+                    // 삭제 성공 시 목록 페이지로 이동
+                    alert('내용이 삭제되었습니다.');
+                    window.location.href = "{{ url_for('routes.index') }}";
+                },
+                error: function() {
+                    alert('삭제에 실패했습니다.');
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
