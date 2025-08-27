@@ -1,9 +1,9 @@
-📄 Simple Share App
+## 📄 Simple Share App
 Simple Share App is a web application designed for easily sharing text and files. It's built to allow users on the same network to quickly exchange content by scanning a QR code or accessing a simple link.
 
 The app requires no sign-up or login process, making it possible to upload and share content instantly.
 
-✨ Key Features
+### ✨ Key Features
 Text Sharing: Write and share text freely with support for Markdown syntax.
 
 File Upload: Easily upload files up to 5MB using drag-and-drop or a standard file selection dialog.
@@ -16,31 +16,31 @@ Simple Deletion: Uploaded content can be instantly deleted from the list.
 
 Security: HTML escaping is implemented to prevent Cross-Site Scripting (XSS) attacks.
 
-💻 Technology Stack
+## 💻 Technology Stack
 Backend: Flask (Python)
 
 Database: SQLite (in-memory, with a singleton pattern to maintain data for the app's lifetime)
 
 Frontend: HTML, CSS (Tailwind CSS), JavaScript (jQuery)
 
-🚀 How to Run the Project
+## 🚀 How to Run the Project
 Install Required Libraries:
 Install the project's dependencies.
 ```
 pip install -r requirements.txt
 ```
 
-Run the Application:
+## Run the Application:
 ```
 python run.py
 ```
 
-Access the App:
+## Access the App:
 Once the application is running, open a web browser and navigate to the address shown in the terminal, such as http://0.0.0.0:5000.
 
 To access the app from another device on the same network, scan the QR code on the /qr page or navigate to http://[SERVER_LOCAL_IP]:5000.
 
-📂 Project Structure
+## 📂 Project Structure
 ```
 .
 ├── app/
@@ -56,6 +56,3 @@ To access the app from another device on the same network, scan the QR code on t
 ├── requirements.txt          # Python dependency list
 └── README.md                 # Project description
 ```
-
-🤝 Contribution
-This project is open-source, and contributions are welcome. Feel free to report bugs, suggest new features, or refactor code.
