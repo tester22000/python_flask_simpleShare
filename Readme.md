@@ -4,7 +4,7 @@ Simple Share App is a web application designed for easily sharing text and files
 The app requires no sign-up or login process, making it possible to upload and share content instantly.
 
 ### ✨ Key Features
-Text Sharing: Write and share text freely with support for Markdown syntax.
+Text Sharing: Write and share text freely.
 
 File Upload: Easily upload files up to 5MB using drag-and-drop or a standard file selection dialog.
 
@@ -19,7 +19,7 @@ Security: HTML escaping is implemented to prevent Cross-Site Scripting (XSS) att
 ## 💻 Technology Stack
 Backend: Flask (Python)
 
-Database: SQLite (in-memory, with a singleton pattern to maintain data for the app's lifetime)
+Database: SQLite
 
 Frontend: HTML, CSS (Tailwind CSS), JavaScript (jQuery)
 
@@ -56,3 +56,4 @@ To access the app from another device on the same network, scan the QR code on t
 ├── requirements.txt          # Python dependency list
 └── README.md                 # Project description
 ```
+
